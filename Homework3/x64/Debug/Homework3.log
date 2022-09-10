@@ -1,0 +1,7 @@
+﻿  glad.c
+  LoadShaders.cpp
+  homework3.cpp
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(69,46): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(72,47): warning C4305: 'argument': truncation from 'double' to 'float'
+  Generating Code...
+  Homework3.vcxproj -> C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\x64\Debug\Homework3.exe

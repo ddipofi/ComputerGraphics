@@ -242,8 +242,8 @@ void buildObjects() {
 		glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
 	}
 
-	glGenVertexArrays(1, &vertexBuffers[1]);
-	glBindVertexArray(vertexBuffers[1]);
+	glGenVertexArrays(1, &vertexBuffers[2]);
+	glBindVertexArray(vertexBuffers[2]);
 
 	// Alternately...
 	// GLuint   vaoID;
@@ -256,7 +256,7 @@ void buildObjects() {
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[2]);
 	delete[] normals;
 	delete[] vertices;
-	vertices = readOBJFile("tiger.obj", nbrTriangles[2], normals);
+	vertices = readOBJFile("roof.obj", nbrTriangles[2], normals);
 	verticesSize = nbrTriangles[2] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
 	normalsSize = nbrTriangles[2] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
 	glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
@@ -277,6 +277,9 @@ void buildObjects() {
 		glEnableVertexAttribArray(vNormal);
 		glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
 	}
+
+	glGenVertexArrays(1, &vertexBuffers[1]);
+	glBindVertexArray(vertexBuffers[1]);
 
 	//building tiger
 	glGenBuffers(1, &(arrayBuffers[1]));

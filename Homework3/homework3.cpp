@@ -10,11 +10,13 @@
 #include <vector>
 using namespace std;
 /*
- * Computer Graphics I -- Homework 3.
+ * Computer Graphics I -- Project 1 -- Base Code.
  * Name:  
  *
- * This homework is checking if you can get a "simple" OpenGL application 
- * compiled and running on your development platform/environment.  
+ * This code is a framework/starting point for project 1 in the course.  
+ * you may feel free to use and modify this code for the project (in 
+ * fact I strongly suggest it!)
+ * 
  */
 
 #define BUFFER_OFFSET(x)  ((const void*) (x))
@@ -36,7 +38,7 @@ GLuint vertexBuffers[10], arrayBuffers[10], elementBuffers[10];
 *   access them.
 */
 float rotationAngle;
-int nbrTriangles;
+int nbrTriangles[10];
 mat4x4 rotation;
 map<string, GLuint> locationMap;
 
@@ -49,6 +51,7 @@ void setAttributes(float lineWidth = 1.0, GLenum face = GL_FRONT_AND_BACK,
 void buildObjects();
 void getLocations();
 void init(string vertexShader, string fragmentShader);
+float* readOBJFile(string filename, int& nbrTriangles, float*& normalArray);
 /*
  * Error callback routine for glfw -- uses cstdio
  */
@@ -58,19 +61,69 @@ static void error_callback(int error, const char* description)
 }
 
 /*
- * keypress callback for glfw -- Escape exits...
+ * keypress callbacks for glfw -- Escape exits...
  */
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	static float currentAngle = 0.0;
+	static float currentLimit = 1.0;
+	mat4x4 viewingMatrix;
+	mat4x4 projectionMatrix;
+
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-		mat4x4_rotate_Y(rotation, rotation, 0.31419);
+		currentAngle += 3.14159 / 18;  // 10 degrees
+		vec3 eyePoint = { sin(currentAngle), 0.0f, cos(currentAngle) };
+		vec3 upVector = { 0.0f, 1.0f, 0.0f };
+		vec3 centerPoint = { 0.0f, 0.0f, 0.0f };
+		mat4x4_look_at(viewingMatrix, eyePoint, centerPoint, upVector);	
+		GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
+		glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
+	}
+	else if (key == GLFW_KEY_PERIOD && action == GLFW_PRESS) {
+		currentAngle += 3.14159 / 18;  // 10 degrees
+		vec3 eyePoint = { sin(currentAngle), 0.0f, cos(currentAngle) };
+		vec3 upVector = { 0.0f, 1.0f, 0.0f };
+		vec3 centerPoint = { 0.0f, 0.0f, 0.0f };
+		mat4x4_look_at(viewingMatrix, eyePoint, centerPoint, upVector);
+		GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
+		glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
 	}
 	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-		mat4x4_rotate_Y(rotation, rotation, -0.31419);
+		currentAngle -= 3.14159 / 18;  // 10 degrees
+		vec3 eyePoint = { sin(currentAngle), 0.0f, cos(currentAngle) };
+		vec3 upVector = { 0.0f, 1.0f, 0.0f };
+		vec3 centerPoint = { 0.0f, 0.0f, 0.0f };
+		mat4x4_look_at(viewingMatrix, eyePoint, centerPoint, upVector);
+		GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
+		glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
 	}
+	else if (key == GLFW_KEY_COMMA && action == GLFW_PRESS) {
+		currentAngle -= 3.14159 / 18;  // 10 degrees
+		vec3 eyePoint = { sin(currentAngle), 0.0f, cos(currentAngle) };
+		vec3 upVector = { 0.0f, 1.0f, 0.0f };
+		vec3 centerPoint = { 0.0f, 0.0f, 0.0f };
+		mat4x4_look_at(viewingMatrix, eyePoint, centerPoint, upVector);
+		GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
+		glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
+	}
+	else if (key == GLFW_KEY_MINUS && action == GLFW_PRESS) {
+		currentLimit = currentLimit * 2;
+		mat4x4_ortho(projectionMatrix, -currentLimit, currentLimit, -currentLimit, currentLimit, -100.0f, 100.0f);
+		GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
+		glUniformMatrix4fv(projectionMatrixLocation, 1, false, (const GLfloat*)projectionMatrix);
+
+	}
+	else if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS) {
+		currentLimit = currentLimit / 2;
+		mat4x4_ortho(projectionMatrix, -currentLimit, currentLimit, -currentLimit, currentLimit, -100.0f, 100.0f);
+		GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
+		glUniformMatrix4fv(projectionMatrixLocation, 1, false, (const GLfloat*)projectionMatrix);
+
+	}
+
 }
 
 /*
@@ -150,35 +203,6 @@ void setAttributes(float lineWidth, GLenum face, GLenum fill) {
 
 void buildObjects() {
 
-	GLfloat vertices[] = {
-					   -0.5f, -0.5f, -0.5f, 1.0f, -0.5f,  0.5f,  0.5f, 1.0f, -0.5f, -0.5f,  0.5f, 1.0f,
-					   -0.5f, -0.5f, -0.5f, 1.0f, -0.5f,  0.5f,  0.5f, 1.0f, -0.5f,  0.5f, -0.5f, 1.0f,
-					   -0.5f, -0.5f, -0.5f, 1.0f, -0.5f,  0.5f, -0.5f, 1.0f,  0.5f,  0.5f, -0.5f, 1.0f,
-					   -0.5f, -0.5f, -0.5f, 1.0f,  0.5f,  0.5f, -0.5f, 1.0f,  0.5f, -0.5f, -0.5f, 1.0f,
-					   -0.5f, -0.5f, -0.5f, 1.0f,  0.5f, -0.5f, -0.5f, 1.0f,  0.5f, -0.5f,  0.5f, 1.0f,
-					   -0.5f, -0.5f, -0.5f, 1.0f,  0.5f, -0.5f,  0.5f, 1.0f, -0.5f, -0.5f,  0.5f, 1.0f,
-					   -0.5f, -0.5f,  0.5f, 1.0f, -0.5f,  0.5f,  0.5f, 1.0f,  0.5f,  0.5f,  0.5f, 1.0f,
-					   -0.5f, -0.5f,  0.5f, 1.0f,  0.5f,  0.5f,  0.5f, 1.0f,  0.5f, -0.5f,  0.5f, 1.0f,
-					   -0.5f,  0.5f,  0.5f, 1.0f, -0.5f,  0.5f, -0.5f, 1.0f,  0.5f,  0.5f,  0.5f, 1.0f,
-						0.5f,  0.5f,  0.5f, 1.0f,  0.5f,  0.5f, -0.5f, 1.0f, -0.5f,  0.5f, -0.5f, 1.0f,
-						0.5f, -0.5f,  0.5f, 1.0f,  0.5f, -0.5f, -0.5f, 1.0f,  0.5f,  0.5f, -0.5f, 1.0f,
-						0.5f, -0.5f,  0.5f, 1.0f,  0.5f,  0.5f, -0.5f, 1.0f,  0.5f,  0.5f,  0.5f, 1.0f
-	};
-
-	GLfloat colors[] = {
-							0.0f, 0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f,  0.0f, 1.0f, 1.0f, 1.0f,
-							0.0f, 0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,
-							0.0f, 0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,
-							0.0f, 0.0f, 0.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-							0.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-							0.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f,
-							0.0f, 0.0f, 1.0f, 1.0f,  0.0f, 1.0f, 1.0f, 1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
-							0.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f, 1.0f, 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-							0.0f, 1.0f, 1.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
-							1.0f, 1.0f, 1.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,
-							1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,
-							1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f, 1.0f
-	};
 
 	glGenVertexArrays(1, vertexBuffers);
 	glBindVertexArray(vertexBuffers[0]);
@@ -189,18 +213,21 @@ void buildObjects() {
 	// glBindVertexArray(vaoID);
 	//
 
-/*
- * Test code for internal object.
- */
-	nbrTriangles = 12;
+
 	glGenBuffers(1, &(arrayBuffers[0]));
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(vertices) + sizeof(colors),
+	GLfloat* normals;
+	GLfloat *vertices = readOBJFile("column.obj", nbrTriangles[0], normals);
+	const int nbrVerticesPerTriangle = 3;
+	const int nbrFloatsPerVertex = 4; // x, y, z, w
+	const int nbrFloatsPerNormal = 3; // dx, dy, dz
+	int  verticesSize = nbrTriangles[0] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
+	int normalsSize = nbrTriangles[0] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
+	glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
 		NULL, GL_STATIC_DRAW);
 	//                               offset in bytes   size in bytes     ptr to data    
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(colors), colors);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, verticesSize, vertices);
+	glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, normals);
 	/*
 	 * Set up variables into the shader programs (Note:  We need the
 	 * shaders loaded and built into a program before we do this)
@@ -209,9 +236,74 @@ void buildObjects() {
 	glEnableVertexAttribArray(vPosition);
 	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
-	GLuint vColor = glGetAttribLocation(programID, "vColor");
-	glEnableVertexAttribArray(vColor);
-	glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(vertices)));
+	GLuint vNormal = glGetAttribLocation(programID, "vNormal");
+	if (vNormal != -1) {
+		glEnableVertexAttribArray(vNormal);
+		glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
+	}
+
+	glGenVertexArrays(1, &vertexBuffers[1]);
+	glBindVertexArray(vertexBuffers[1]);
+
+	// Alternately...
+	// GLuint   vaoID;
+	// glGenVertexArrays(1, &vaoID);
+	// glBindVertexArray(vaoID);
+	//
+
+	//build roof
+	glGenBuffers(1, &(arrayBuffers[2]));
+	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[2]);
+	delete[] normals;
+	delete[] vertices;
+	vertices = readOBJFile("tiger.obj", nbrTriangles[2], normals);
+	verticesSize = nbrTriangles[2] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
+	normalsSize = nbrTriangles[2] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
+	glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
+		NULL, GL_STATIC_DRAW);
+	//                               offset in bytes   size in bytes     ptr to data    
+	glBufferSubData(GL_ARRAY_BUFFER, 0, verticesSize, vertices);
+	glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, normals);
+	/*
+	 * Set up variables into the shader programs (Note:  We need the
+	 * shaders loaded and built into a program before we do this)
+	 */
+	vPosition = glGetAttribLocation(programID, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+	vNormal = glGetAttribLocation(programID, "vNormal");
+	if (vNormal != -1) {
+		glEnableVertexAttribArray(vNormal);
+		glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
+	}
+
+	//building tiger
+	glGenBuffers(1, &(arrayBuffers[1]));
+	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
+	delete[] normals;
+	delete[] vertices;
+	vertices = readOBJFile("tiger.obj", nbrTriangles[1], normals);
+	verticesSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
+	normalsSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
+	glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
+		NULL, GL_STATIC_DRAW);
+	//                               offset in bytes   size in bytes     ptr to data    
+	glBufferSubData(GL_ARRAY_BUFFER, 0, verticesSize, vertices);
+	glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, normals);
+	/*
+	 * Set up variables into the shader programs (Note:  We need the
+	 * shaders loaded and built into a program before we do this)
+	 */
+    vPosition = glGetAttribLocation(programID, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+	vNormal = glGetAttribLocation(programID, "vNormal");
+	if (vNormal != -1) {
+		glEnableVertexAttribArray(vNormal);
+		glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
+	}
 }
 
 /*
@@ -252,22 +344,76 @@ void init(string vertexShader, string fragmentShader) {
 
 	programID = buildProgram(vertexShader, fragmentShader);
 	mat4x4_identity(rotation);
+
 	buildObjects();
 
 	getLocations();
-
+	// Originally set the viewing, projection, and modeling matrices to the identity matrix
+	// 
+	glUniformMatrix4fv(locationMap["viewingMatrix"], 1, false, (const GLfloat*)rotation);
+	glUniformMatrix4fv(locationMap["projectionMatrix"], 1, false, (const GLfloat*)rotation);
+	glUniformMatrix4fv(locationMap["modelingMatrix"], 1, false, (const GLfloat*)rotation);
 }
 
 /*
  * The display routine is basically unchanged at this point.
  */
 void display() {
+	mat4x4 translationMatrix;
+	mat4x4 identityMatrix;
 
+	mat4x4_identity(identityMatrix);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed -- clears screen before drawing. 
+
 	GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
 	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)rotation);
-	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles * 3);
+	GLuint colorLocation = glGetUniformLocation(programID, "color");
+	GLfloat drawColor[] = { 1.0f, 0.0f, 1.0f, 1.0f }; // color to draw with -- currently magenta
 
+	mat4x4_translate(rotation, 0.5f, -0.5f, 0.5f);
+	glUniform4fv(colorLocation, 1, drawColor);
+	glBindVertexArray(vertexBuffers[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
+	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
+
+	drawColor[0] = 0.8f;
+	drawColor[2] = 0.4f;
+	mat4x4_translate(translationMatrix, -0.5f, -0.5f, 0.5f);
+	glUniform4fv(colorLocation, 1, drawColor);
+	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)translationMatrix);
+	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
+
+	drawColor[0] = 0.4f;
+	mat4x4_translate(translationMatrix, -0.5f, -0.5f, -0.5f);
+	glUniform4fv(colorLocation, 1, drawColor);
+	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)translationMatrix);
+	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
+
+	drawColor[2] = 0.6f;
+	mat4x4_translate(translationMatrix, 0.5f, -0.5f, -0.5f);
+	glUniform4fv(colorLocation, 1, drawColor);
+	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)translationMatrix);
+	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
+	
+	//draw roof
+	drawColor[0] = 1.0f;
+	drawColor[1] = 1.0f;
+	drawColor[2] = 0.1f;
+	mat4x4_translate(identityMatrix, 0.0f, 0.5f, 0.0f);
+	glUniform4fv(colorLocation, 1, drawColor);
+	glBindVertexArray(vertexBuffers[2]);
+	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[2]);
+	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)identityMatrix);
+	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[2] * 3);
+
+	//  draw a tiger...
+	drawColor[0] = 0.0f;
+	mat4x4_translate(identityMatrix, 0.0f, -0.5f, 0.0f);
+	glUniform4fv(colorLocation, 1, drawColor);
+	glBindVertexArray(vertexBuffers[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
+	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)identityMatrix);
+	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[1] * 3);
 }
 
 /*
@@ -287,8 +433,8 @@ void reshapeWindow(GLFWwindow* window, int width, int height)
 */
 int main(int argCount, char* argValues[]) {
 	GLFWwindow* window = nullptr;
-	window = glfwStartUp(argCount, argValues, "My Test of New Routines");
-	init("passthrough.vert", "passthrough.frag");
+	window = glfwStartUp(argCount, argValues, "Project 1 Base Code -- Dominic DiPofi");
+	init("project1.vert", "project1.frag");
 	glfwSetWindowSizeCallback(window, reshapeWindow);
 
 	while (!glfwWindowShouldClose(window))

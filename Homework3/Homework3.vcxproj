@@ -149,6 +149,7 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="homework3.cpp" />
     <ClCompile Include="LoadShaders.cpp" />
+    <ClCompile Include="objReader2.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -7,10 +7,10 @@
 using namespace std;
 
 /*
- * Code to read in a simple Wavefront OBJ file.  The code will read in a file with only
- * vertices and faces.  (NO normals).  The user needs to pass a string containing the
+ * Code to read in a simple Wavefront OBJ file.  The code will read in a file with only 
+ * vertices and faces.  (NO normals).  The user needs to pass a string containing the 
  * filename and a variable to hold the number of triangles (an integer).  It returns a
- * pointer to an array containing the triangle information and the number of triangles
+ * pointer to an array containing the triangle information and the number of triangles 
  * should be stored in the second argument.
  *
  * Author:  Jerry Heuring
@@ -23,22 +23,22 @@ using namespace std;
  *    normal data was included and the routine crashed trying to use the vector of information.
  *
  */
-float* readOBJFile(string filename, int& nbrTriangles, float*& normalArray) {
+float *readOBJFile (string filename, int &nbrTriangles, float * &normalArray) {
 	/*
 	 * I'm going to use vectors to hold the items I read in.
 	 * this is not terribly efficient but I'm striving for simplicity here
 	 * rather than efficiency.
 	 */
-	vector<float*> vertices;
-	vector<int*> triangles;
-	vector<float*> normals;
-	vector<int*> triangleNormals;
+	vector<float *> vertices;
+	vector<int *> triangles;
+	vector<float *> normals;
+	vector<int *> triangleNormals;
 
 	string currentLine, lineType;
-	istrstream* lineRdr;
-	float* vertex, * normal;
-	int* triangle;
-	int* triangleNormal;
+	istrstream *lineRdr;
+	float *vertex, *normal;
+	int *triangle;
+	int *triangleNormal;
 	char slash;
 	float value;
 
@@ -60,7 +60,7 @@ float* readOBJFile(string filename, int& nbrTriangles, float*& normalArray) {
 	vertex[0] = vertex[1] = vertex[2] = 0.0f;
 	vertex[3] = 1.0f;
 	vertices.push_back(vertex); // put an empty entry in 0 so that we don't need to adjust 
-	normal = new float[3]; normal[0] = 1.0; normal[1] = normal[2] = 0.0;
+	normal = new float[3]; normal[0] = 1.0; normal[1] =normal[2] = 0.0;
 	normals.push_back(normal);
 	while (!infile.fail() && !infile.eof()) { // read data in...
 		getline(infile, currentLine);
@@ -72,34 +72,31 @@ float* readOBJFile(string filename, int& nbrTriangles, float*& normalArray) {
 			*lineRdr >> vertex[0] >> vertex[1] >> vertex[2];  // should check for errors.
 			vertex[3] = 1.0f;
 			vertices.push_back(vertex);
-		}
-		else if (lineType == "vn") {
+		} else if (lineType == "vn") {
 			normal = new float[3];
 			*lineRdr >> normal[0] >> normal[1] >> normal[2];
 			normals.push_back(normal);
-		}
-		else if (lineType == "f") { // process the face
-			triangle = new int[3];
+		} else if (lineType == "f" ) { // process the face
+			triangle = new int [3];
 
 			*lineRdr >> triangle[0];
 			if (lineRdr->peek() == '/') { // assume we have normals
-				triangleNormal = new int[3];
-				*lineRdr >> slash;
-				if (lineRdr->peek() == '/') {  // assume we don't have textures.
-					*lineRdr >> slash >> triangleNormal[0] >> triangle[1] >> slash >> slash >> triangleNormal[1] >> triangle[2] >> slash >> slash >> triangleNormal[2];
-				}
-				else { // assume we do have textures
-					int tex0, tex1, tex2;
-					*lineRdr >> tex0 >> slash >> triangleNormal[0] >> triangle[1] >> slash >> tex1 >> slash >> triangleNormal[1] >> triangle[2] >> slash >> tex2 >> slash >> triangleNormal[2];
-				}
+			triangleNormal = new int [3];
+			
+			*lineRdr >> slash;
+			if (lineRdr->peek() == '/') { // assume we have no textures
+				*lineRdr >> slash >> triangleNormal[0] >> triangle[1] >> slash >> slash >> triangleNormal[1] >> triangle[2] >> slash >> slash >> triangleNormal[2];
+			} else { // assume we have textures...
+				int tex0, tex1, tex2;
+				*lineRdr >> tex0 >> slash >> triangleNormal[0] >> triangle[1] >> slash >> tex1 >> slash >> triangleNormal[1] >> triangle[2] >> slash >> tex2 >> slash >> triangleNormal[2];
+			}
 				triangles.push_back(triangle);
 				triangleNormals.push_back(triangleNormal);
-			}
-			else {
+			} else {
 				*lineRdr >> triangle[1] >> triangle[2];  // should check for errors.
 				triangles.push_back(triangle);
 			}
-
+			
 		}
 		delete lineRdr;  // ought to reinitialize it rather than create a new one.  
 	}
@@ -107,17 +104,16 @@ float* readOBJFile(string filename, int& nbrTriangles, float*& normalArray) {
 	 * Build an array to hold the coordinates.  Remember everything
 	 * is a triangle.
 	 */
-	float* triangleVertices = new float[triangles.size() * 3 * 4];
+	float * triangleVertices = new float [triangles.size()*3 * 4];
 	nbrTriangles = triangles.size();
 	normalArray = new float[triangles.size() * 3 * 3];
 
-	float* normalVector;
+	float *normalVector;
 	for (int i = 0; i < triangles.size(); i++) {
 		triangle = triangles[i];
 		if (i < triangleNormals.size()) {
 			triangleNormal = triangleNormals[i];
-		}
-		else {
+		} else {
 			triangleNormal = NULL;
 		}
 		for (int j = 0; j < 3; j++) {
@@ -130,14 +126,14 @@ float* readOBJFile(string filename, int& nbrTriangles, float*& normalArray) {
 				triangleVertices[i * 12 + j * 4 + k] = (vertices[triangle[j]])[k];
 			}
 		}
-//		delete[] triangle;
-//		delete[] triangleNormal;
+		delete [] triangle;
+//		delete [] normal;
 	}
 	/*
 	 * finish the clean up....
 	 */
 	for (int i = 0; i < vertices.size(); i++) {
-		delete[] vertices[i];
+		delete [] vertices[i];
 	}
 	/*
 	 * Return the pointer to the array.

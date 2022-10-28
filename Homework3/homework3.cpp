@@ -4,8 +4,12 @@
 #include <string>
 #include <iostream>
 #include <cstdlib>
+#include <chrono>
 #include "LoadShaders.h"
 #include "linmath.h"
+#include "IndexedPolygonObject.h"
+#include "OBJDrawable.h"
+#include "cmath"
 #include <map>
 #include <vector>
 using namespace std;
@@ -41,6 +45,7 @@ float rotationAngle;
 int nbrTriangles[10];
 mat4x4 rotation;
 map<string, GLuint> locationMap;
+const double pi = 3.1415926535897932;
 
 // Prototypes
 GLuint buildProgram(string vertexShaderName, string fragmentShaderName);
@@ -49,6 +54,7 @@ GLFWwindow* glfwStartUp(int& argCount, char* argValues[],
 void setAttributes(float lineWidth = 1.0, GLenum face = GL_FRONT_AND_BACK,
 	GLenum fill = GL_FILL);
 void buildObjects();
+float t = 0.0;
 void getLocations();
 void init(string vertexShader, string fragmentShader);
 float* readOBJFile(string filename, int& nbrTriangles, float*& normalArray);
@@ -217,7 +223,7 @@ void buildObjects() {
 	glGenBuffers(1, &(arrayBuffers[0]));
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
 	GLfloat* normals;
-	GLfloat *vertices = readOBJFile("column.obj", nbrTriangles[0], normals);
+	GLfloat *vertices = readOBJFile("triangulatedAirplane.obj", nbrTriangles[0], normals);
 	const int nbrVerticesPerTriangle = 3;
 	const int nbrFloatsPerVertex = 4; // x, y, z, w
 	const int nbrFloatsPerNormal = 3; // dx, dy, dz
@@ -242,51 +248,15 @@ void buildObjects() {
 		glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
 	}
 
-	glGenVertexArrays(1, &vertexBuffers[2]);
-	glBindVertexArray(vertexBuffers[2]);
-
-	// Alternately...
-	// GLuint   vaoID;
-	// glGenVertexArrays(1, &vaoID);
-	// glBindVertexArray(vaoID);
-	//
-
-	//build roof
-	glGenBuffers(1, &(arrayBuffers[2]));
-	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[2]);
-	delete[] normals;
-	delete[] vertices;
-	vertices = readOBJFile("roof.obj", nbrTriangles[2], normals);
-	verticesSize = nbrTriangles[2] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
-	normalsSize = nbrTriangles[2] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
-	glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
-		NULL, GL_STATIC_DRAW);
-	//                               offset in bytes   size in bytes     ptr to data    
-	glBufferSubData(GL_ARRAY_BUFFER, 0, verticesSize, vertices);
-	glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, normals);
-	/*
-	 * Set up variables into the shader programs (Note:  We need the
-	 * shaders loaded and built into a program before we do this)
-	 */
-	vPosition = glGetAttribLocation(programID, "vPosition");
-	glEnableVertexAttribArray(vPosition);
-	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-
-	vNormal = glGetAttribLocation(programID, "vNormal");
-	if (vNormal != -1) {
-		glEnableVertexAttribArray(vNormal);
-		glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(verticesSize));
-	}
-
 	glGenVertexArrays(1, &vertexBuffers[1]);
 	glBindVertexArray(vertexBuffers[1]);
 
-	//building tiger
+	//building bridge
 	glGenBuffers(1, &(arrayBuffers[1]));
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
 	delete[] normals;
 	delete[] vertices;
-	vertices = readOBJFile("tiger.obj", nbrTriangles[1], normals);
+	vertices = readOBJFile("GoldenGateTriangulatedRotated.obj", nbrTriangles[1], normals);
 	verticesSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerVertex * sizeof(GLfloat);
 	normalsSize = nbrTriangles[1] * nbrVerticesPerTriangle * nbrFloatsPerNormal * sizeof(GLfloat);
 	glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize,
@@ -371,52 +341,32 @@ void display() {
 	GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
 	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)rotation);
 	GLuint colorLocation = glGetUniformLocation(programID, "color");
-	GLfloat drawColor[] = { 1.0f, 0.0f, 1.0f, 1.0f }; // color to draw with -- currently magenta
+	GLfloat drawColor[] = { 0.4f, 0.4f, 0.4f, 1.0f }; // color to draw with -- currently magenta
 
-	mat4x4_translate(rotation, 0.5f, -0.5f, 0.5f);
+	// plane
 	glUniform4fv(colorLocation, 1, drawColor);
 	glBindVertexArray(vertexBuffers[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
 	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
 
-	drawColor[0] = 0.8f;
-	drawColor[2] = 0.4f;
-	mat4x4_translate(translationMatrix, -0.5f, -0.5f, 0.5f);
-	glUniform4fv(colorLocation, 1, drawColor);
-	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)translationMatrix);
-	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
-
-	drawColor[0] = 0.4f;
-	mat4x4_translate(translationMatrix, -0.5f, -0.5f, -0.5f);
-	glUniform4fv(colorLocation, 1, drawColor);
-	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)translationMatrix);
-	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
-
-	drawColor[2] = 0.6f;
-	mat4x4_translate(translationMatrix, 0.5f, -0.5f, -0.5f);
-	glUniform4fv(colorLocation, 1, drawColor);
-	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)translationMatrix);
-	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[0] * 3);
-	
-	//draw roof
-	drawColor[0] = 1.0f;
-	drawColor[1] = 1.0f;
-	drawColor[2] = 0.1f;
-	mat4x4_translate(identityMatrix, 0.0f, 0.5f, 0.0f);
-	glUniform4fv(colorLocation, 1, drawColor);
-	glBindVertexArray(vertexBuffers[2]);
-	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[2]);
-	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)identityMatrix);
-	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[2] * 3);
-
-	//  draw a tiger...
-	drawColor[0] = 0.0f;
-	mat4x4_translate(identityMatrix, 0.0f, -0.5f, 0.0f);
+	//  draw a bridge...
 	glUniform4fv(colorLocation, 1, drawColor);
 	glBindVertexArray(vertexBuffers[1]);
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[1]);
 	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)identityMatrix);
 	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles[1] * 3);
+
+	//move
+	
+	std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	t += std::chrono::duration<float, std::milli>(end - start).count();
+
+	float xVal = cos(t * 2 * pi);
+	float yVal = 2.5 * cos(t * 2 * pi + (pi / 2)) + 2.7;
+	float zVal = sin(2 * t * 2 * pi);
+	std::cout << t << endl;
+	mat4x4_translate(rotation, xVal, yVal, zVal);
 }
 
 /*
@@ -436,8 +386,8 @@ void reshapeWindow(GLFWwindow* window, int width, int height)
 */
 int main(int argCount, char* argValues[]) {
 	GLFWwindow* window = nullptr;
-	window = glfwStartUp(argCount, argValues, "Project 1 Base Code -- Dominic DiPofi");
-	init("project1.vert", "project1.frag");
+	window = glfwStartUp(argCount, argValues, "Project 2 Base Code -- Dominic DiPofi");
+	init("project2.vert", "project2.frag");
 	glfwSetWindowSizeCallback(window, reshapeWindow);
 
 	while (!glfwWindowShouldClose(window))

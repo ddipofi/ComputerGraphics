@@ -29,9 +29,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="homework3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LoadShaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OBJDrawable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="project2main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -149,11 +149,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
-    <ClCompile Include="homework3.cpp" />
     <ClCompile Include="IndexedPolygonObject.cpp" />
     <ClCompile Include="LoadShaders.cpp" />
     <ClCompile Include="OBJDrawable.cpp" />
     <ClCompile Include="objReader2.cpp" />
+    <ClCompile Include="project2main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

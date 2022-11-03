@@ -1,12 +1,19 @@
-﻿  homework3.cpp
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(83,31): warning C4305: '+=': truncation from 'double' to 'float'
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(92,31): warning C4305: '+=': truncation from 'double' to 'float'
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(101,31): warning C4305: '-=': truncation from 'double' to 'float'
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(110,31): warning C4305: '-=': truncation from 'double' to 'float'
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(248,60): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(278,60): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(365,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(366,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(367,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\homework3.cpp(335,9): warning C4101: 'translationMatrix': unreferenced local variable
+﻿  project2main.cpp
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(83,31): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(92,31): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(101,31): warning C4305: '-=': truncation from 'double' to 'float'
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(110,31): warning C4305: '-=': truncation from 'double' to 'float'
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(248,60): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(278,60): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(360,18): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(366,90): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(366,47): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(366,30): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(367,136): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(367,118): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(367,60): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(368,98): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(368,51): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(368,30): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\project2main.cpp(335,9): warning C4101: 'translationMatrix': unreferenced local variable
   Homework3.vcxproj -> C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\x64\Debug\Homework3.exe

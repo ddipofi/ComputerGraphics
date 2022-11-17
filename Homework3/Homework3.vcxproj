@@ -142,18 +142,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="IndexedPolygonObject.h" />
-    <ClInclude Include="linmath.h" />
-    <ClInclude Include="LoadShaders.h" />
-    <ClInclude Include="OBJDrawable.h" />
+    <ClCompile Include="FountainParticles.cpp" />
+    <ClCompile Include="glad.c" />
+    <ClCompile Include="LoadShaders.cpp" />
+    <ClCompile Include="objReader2.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="glad.c" />
-    <ClCompile Include="IndexedPolygonObject.cpp" />
-    <ClCompile Include="LoadShaders.cpp" />
-    <ClCompile Include="OBJDrawable.cpp" />
-    <ClCompile Include="objReader2.cpp" />
-    <ClCompile Include="project2main.cpp" />
+    <ClInclude Include="FountainParticles.h" />
+    <ClInclude Include="linmath.h" />
+    <ClInclude Include="LoadShaders.h" />
+    <ClInclude Include="ParticleInterface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

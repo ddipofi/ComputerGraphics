@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "93af2bfc-12c3-413c-8d78-30219c8ac48d": {
+      "ProjectGuid": "93af2bfc-12c3-413c-8d78-30219c8ac48d",
+      "DisplayName": "EmbeddedHw",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}

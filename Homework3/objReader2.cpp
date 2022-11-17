@@ -32,13 +32,13 @@ float *readOBJFile (string filename, int &nbrTriangles, float * &normalArray) {
 	vector<float *> vertices;
 	vector<int *> triangles;
 	vector<float *> normals;
-	vector<int *> triangleNormals;
+	vector<float *> triangleNormals;
 
 	string currentLine, lineType;
 	istrstream *lineRdr;
 	float *vertex, *normal;
 	int *triangle;
-	int *triangleNormal;
+	float *triangleNormal;
 	char slash;
 	float value;
 
@@ -81,15 +81,8 @@ float *readOBJFile (string filename, int &nbrTriangles, float * &normalArray) {
 
 			*lineRdr >> triangle[0];
 			if (lineRdr->peek() == '/') { // assume we have normals
-			triangleNormal = new int [3];
-			
-			*lineRdr >> slash;
-			if (lineRdr->peek() == '/') { // assume we have no textures
-				*lineRdr >> slash >> triangleNormal[0] >> triangle[1] >> slash >> slash >> triangleNormal[1] >> triangle[2] >> slash >> slash >> triangleNormal[2];
-			} else { // assume we have textures...
-				int tex0, tex1, tex2;
-				*lineRdr >> tex0 >> slash >> triangleNormal[0] >> triangle[1] >> slash >> tex1 >> slash >> triangleNormal[1] >> triangle[2] >> slash >> tex2 >> slash >> triangleNormal[2];
-			}
+			triangleNormal = new float [3];
+			*lineRdr >> slash >> slash >> triangleNormal[0] >> triangle[1] >> slash >> slash >> triangleNormal[1] >> triangle[2] >> slash >> slash >> triangleNormal[2];
 				triangles.push_back(triangle);
 				triangleNormals.push_back(triangleNormal);
 			} else {
@@ -112,14 +105,14 @@ float *readOBJFile (string filename, int &nbrTriangles, float * &normalArray) {
 	for (int i = 0; i < triangles.size(); i++) {
 		triangle = triangles[i];
 		if (i < triangleNormals.size()) {
-			triangleNormal = triangleNormals[i];
+			normal = triangleNormals[i];
 		} else {
-			triangleNormal = NULL;
+			normal = NULL;
 		}
 		for (int j = 0; j < 3; j++) {
 			for (int k = 0; k < 4; k++) {
-				if (triangleNormal != NULL && k != 3) {
-					normalVector = normals[triangleNormal[j]];
+				if (normal != NULL && k != 3) {
+					normalVector = normals[normal[j]];
 					value = normalVector[k];
 					normalArray[((i * 3) + j) * 3 + k] = value;
 				}
@@ -127,7 +120,7 @@ float *readOBJFile (string filename, int &nbrTriangles, float * &normalArray) {
 			}
 		}
 		delete [] triangle;
-//		delete [] normal;
+		delete [] normal;
 	}
 	/*
 	 * finish the clean up....

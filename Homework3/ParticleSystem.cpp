@@ -68,17 +68,17 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
-	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-		mat4x4_rotate_Y(rotation, rotation, 0.31419);
-	}
-	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-		mat4x4_rotate_Y(rotation, rotation, -0.31419);
-	}
 	else if (key == GLFW_KEY_X && action == GLFW_PRESS) {
-		mat4x4_look_at(viewMatrix, vec3{ 1.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+		mat4x4_look_at(viewMatrix, vec3{ 10.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
 	}
 	else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
-		mat4x4_look_at(viewMatrix, vec3{ 0.0f, 1.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, 1.0f });
+		mat4x4_look_at(viewMatrix, vec3{ 0.0f, 20.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, -1.0f });
+	}
+	else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+		mat4x4_look_at(viewMatrix, vec3{ 0.0f, 0.0f, -10.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+	}
+	else if (key == GLFW_KEY_O && action == GLFW_PRESS) {
+		mat4x4_look_at(viewMatrix, vec3{ 10.0f, 5.0f, -10.0f }, vec3{ 0.0f, 5.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
 	}
 }
 
@@ -166,27 +166,27 @@ void buildObjects() {
 /*
  * Read object in from obj file.
  */
-	GLfloat *cowVertices= nullptr, *cowNormals=nullptr;
-	cowVertices = readOBJFile("triangulatedCowDos.obj", nbrTriangles, cowNormals);
+	GLfloat *snowflakeVertices= nullptr, *snowflakeNormals=nullptr;
+	snowflakeVertices = readOBJFile("snowflake.obj", nbrTriangles, snowflakeNormals);
 	glGenBuffers(1, &(arrayBuffers[0]));
 	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
-	GLuint cowVerticesSize = nbrTriangles * 3.0 * 4.0 * sizeof(GLfloat);
-	GLuint cowNormalsSize = nbrTriangles * 3.0 * 3.0 * sizeof(GLfloat);
-	// The cow has no colors associated with the vertices.  I'm going to make it
+	GLuint snowflakeVerticesSize = nbrTriangles * 3.0 * 4.0 * sizeof(GLfloat);
+	GLuint snowflakeNormalsSize = nbrTriangles * 3.0 * 3.0 * sizeof(GLfloat);
+	// The snowflake has no colors associated with the vertices.  I'm going to make it
 	// gray for right now.
-	GLfloat *cowColors = new GLfloat[nbrTriangles * 3.0 * 4.0];
+	GLfloat *snowflakeColors = new GLfloat[nbrTriangles * 3.0 * 4.0];
 	for (int i = 0; i < nbrTriangles * 3.0 * 4.0; i++) {
-		cowColors[i] = 0.7f;
+		snowflakeColors[i] = 0.7f;
 	}
-	GLuint cowColorsSize = cowVerticesSize;
+	GLuint snowflakeColorsSize = snowflakeVerticesSize;
 	glBufferData(GL_ARRAY_BUFFER,
-		cowVerticesSize + cowColorsSize + cowNormalsSize,
+		snowflakeVerticesSize + snowflakeColorsSize + snowflakeNormalsSize,
 		NULL, GL_STATIC_DRAW);
 	//                               offset in bytes   size in bytes     ptr to data    
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, cowVerticesSize, cowVertices);
-	glBufferSubData(GL_ARRAY_BUFFER, cowVerticesSize, cowColorsSize, cowColors);
-	glBufferSubData(GL_ARRAY_BUFFER, cowVerticesSize+cowColorsSize, cowNormalsSize, cowNormals);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, snowflakeVerticesSize, snowflakeVertices);
+	glBufferSubData(GL_ARRAY_BUFFER, snowflakeVerticesSize, snowflakeColorsSize, snowflakeColors);
+	glBufferSubData(GL_ARRAY_BUFFER, snowflakeVerticesSize+snowflakeColorsSize, snowflakeNormalsSize, snowflakeNormals);
 	/*
 	 * Set up variables into the shader programs (Note:  We need the
 	 * shaders loaded and built into a program before we do this)
@@ -196,10 +196,10 @@ void buildObjects() {
 	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 	GLuint vColors = glGetAttribLocation(programID, "vColor");
 	glEnableVertexAttribArray(vColors);
-	glVertexAttribPointer(vColors, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(cowVerticesSize));
+	glVertexAttribPointer(vColors, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(snowflakeVerticesSize));
 	GLuint vNormal = glGetAttribLocation(programID, "vNormal");
 	glEnableVertexAttribArray(vNormal);
-	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(cowVerticesSize+cowColorsSize));
+	glVertexAttribPointer(vNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(snowflakeVerticesSize+snowflakeColorsSize));
 }
 
 /*
@@ -251,7 +251,7 @@ void init(string vertexShader, string fragmentShader) {
  * The display routine is basically unchanged at this point.
  */
 void displayDirectional() {
-	myParticleSystem.generate(10);
+	myParticleSystem.generate(1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
 	GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
 	mat4x4 translation, mTransform;

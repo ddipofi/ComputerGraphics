@@ -255,7 +255,6 @@ void displayDirectional() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
 	GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
 	mat4x4 translation, mTransform;
-	mat4x4_translate(translation, 3.0f* sin(currentT * 2.0 * 3.14159f), 0.0f, 2.0f*cos(currentT * 2.0 * 3.14159f));
 	mat4x4_mul(mTransform, translation, rotation);
 	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)mTransform);
 	GLuint viewMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
@@ -293,7 +292,7 @@ void displayDirectional() {
 	mat4x4 scale;
 	mat4x4 translate;
 	mat4x4_identity(scale);
-	mat4x4_scale_aniso(scale, scale, 0.1f, 0.1f, 0.1f);;
+	mat4x4_scale_aniso(scale, scale, 0.5f, 0.5f, 0.5f);;
 	mat4x4 modelMatrix;
 	float* positions = myParticleSystem.getPositions();
 	int nbrParticles = myParticleSystem.getNumberOfParticles();
@@ -358,10 +357,11 @@ void reshapeWindow(GLFWwindow* window, int width, int height)
 */
 int main(int argCount, char* argValues[]) {
 	GLFWwindow* window = nullptr;
-	window = glfwStartUp(argCount, argValues, "Lighting Demo");
+	window = glfwStartUp(argCount, argValues, "Project 3 - Snowflakes Falling");
 	init("passthrough.vert", "directional.frag");
 //	init("pointsource.vert", "pointsource.frag");
 	glfwSetWindowSizeCallback(window, reshapeWindow);
+	srand(static_cast <unsigned> (time(0)));
 
 	while (!glfwWindowShouldClose(window))
 	{

@@ -14,9 +14,6 @@ private:
     float* orientations;
     int nbrOfParticles;
     int maxParticles;
-    std::default_random_engine generator;
-    std::normal_distribution<double> velocityDistribution;
-    std::uniform_real_distribution<double> angleDistribution;
 
 public:
     void init(int maxParticles = 1000);

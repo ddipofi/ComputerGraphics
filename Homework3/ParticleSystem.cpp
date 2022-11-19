@@ -251,7 +251,7 @@ void init(string vertexShader, string fragmentShader) {
  * The display routine is basically unchanged at this point.
  */
 void displayDirectional() {
-	myParticleSystem.generate(1);
+	myParticleSystem.generate(2);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
 	GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
 	mat4x4 translation, mTransform;

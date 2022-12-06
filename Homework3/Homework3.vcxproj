@@ -142,17 +142,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FountainParticles.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="LoadShaders.cpp" />
-    <ClCompile Include="objReader2.cpp" />
-    <ClCompile Include="ParticleSystem.cpp" />
+    <ClCompile Include="objReader2modified.cpp" />
+    <ClCompile Include="texturing.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FountainParticles.h" />
     <ClInclude Include="linmath.h" />
     <ClInclude Include="LoadShaders.h" />
-    <ClInclude Include="ParticleInterface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

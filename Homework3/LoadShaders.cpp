@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "LoadShaders.h"
-
+#define _DEBUG
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus

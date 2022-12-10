@@ -1,8 +1,8 @@
 ﻿  texturing.cpp
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(74,47): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(77,46): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(302,3): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(307,3): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(338,3): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
-C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(343,3): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(278,3): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(283,3): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(311,3): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(316,3): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(344,3): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
+C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\texturing.cpp(349,3): warning C4312: 'type cast': conversion from 'int' to 'const void *' of greater size
   Homework3.vcxproj -> C:\Users\Dominic\Classes\Comp Graphics\ComputerGraphics\Homework3\x64\Debug\Homework3.exe

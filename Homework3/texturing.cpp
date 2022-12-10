@@ -35,7 +35,7 @@ bool elements;
 int nbrTriangles, materialToUse = 0;
 int startTriangle = 0, endTriangle = 12;
 bool rotationOn = false;
-mat4x4 rotation;
+mat4x4 rotation, viewingMatrix, projectionMatrix;
 map<string, GLuint> locationMap;
 GLuint textureID[4];
 GLuint currentTextureMap = 0;
@@ -43,6 +43,8 @@ GLuint teapotVAO, teapotBAO;
 int teapotTriangles;
 GLuint cube001VAO, cube001BAO;
 int cube001Triangles;
+GLuint sphere001VAO, sphere001BAO;
+int sphere001Triangles;
 // Prototypes
 GLuint buildProgram(string vertexShaderName, string fragmentShaderName);
 GLFWwindow * glfwStartUp(int& argCount, char* argValues[],
@@ -70,44 +72,18 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
-	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-		mat4x4_rotate_Y(rotation, rotation, -0.31419);
-	}
-	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-		mat4x4_rotate_Y(rotation, rotation, 0.31419);
-	}
-	else if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-		currentTextureMap = 0;
-	}
-	else if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-		currentTextureMap = 1;
-	}
-	else if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
-		currentTextureMap = 2;
-	} 
-	else if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
-		currentTextureMap = 3;
-	}
-
-	/*
-	else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
-	}
 	else if (key == GLFW_KEY_X && action == GLFW_PRESS) {
-		mat4x4_look_at(viewMatrix, vec3{ 10.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+		mat4x4_look_at(viewingMatrix, vec3{ 10.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
 	}
 	else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
-		mat4x4_look_at(viewMatrix, vec3{ 0.0f, 20.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, -1.0f });
+		mat4x4_look_at(viewingMatrix, vec3{ 0.0f, 20.0f, 0.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 0.0f, -1.0f });
 	}
 	else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
-		mat4x4_look_at(viewMatrix, vec3{ 0.0f, 0.0f, -10.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+		mat4x4_look_at(viewingMatrix, vec3{ 0.0f, 0.0f, -10.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
 	}
 	else if (key == GLFW_KEY_O && action == GLFW_PRESS) {
-		mat4x4_look_at(viewMatrix, vec3{ 10.0f, 5.0f, -10.0f }, vec3{ 0.0f, 5.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+		mat4x4_look_at(viewingMatrix, vec3{ 10.0f, 0.0f, -10.0f }, vec3{ 0.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
 	}
-	*/
-
-
 }
 
 /*
@@ -306,9 +282,6 @@ void buildObjects() {
 	glVertexAttribPointer(vTexture, FLOATS_PER_TEXCOORD, GL_FLOAT, GL_FALSE, 0,
 		BUFFER_OFFSET(teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_VERTEX * BYTES_PER_FLOAT+teapotTriangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT));
 
-
-
-
 	//cube
 	float* cube001Normals, * cube001Textures;
 	float* cube001Vertices = readOBJFile("cube001.obj", cube001Triangles, cube001Normals, cube001Textures);
@@ -341,6 +314,39 @@ void buildObjects() {
 	glEnableVertexAttribArray(vTexture);
 	glVertexAttribPointer(vTexture, FLOATS_PER_TEXCOORD, GL_FLOAT, GL_FALSE, 0,
 		BUFFER_OFFSET(cube001Triangles* VERTICES_PER_TRIANGLE* FLOATS_PER_VERTEX* BYTES_PER_FLOAT + cube001Triangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT));
+
+	//sphere
+	float* sphere001Normals, * sphere001Textures;
+	float* sphere001Vertices = readOBJFile("sphere001.obj", sphere001Triangles, sphere001Normals, sphere001Textures);
+	// Print info
+	cout << sphere001Triangles << endl;
+	glGenVertexArrays(1, &sphere001VAO);
+	glBindVertexArray(sphere001VAO);
+	glGenBuffers(1, &sphere001BAO);
+	glBindBuffer(GL_ARRAY_BUFFER, sphere001BAO);
+
+	glBufferData(GL_ARRAY_BUFFER,
+		sphere001Triangles* VERTICES_PER_TRIANGLE* FLOATS_PER_VERTEX* BYTES_PER_FLOAT +
+		sphere001Triangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT +
+		sphere001Triangles * VERTICES_PER_TRIANGLE * FLOATS_PER_TEXCOORD * BYTES_PER_FLOAT,
+		NULL, GL_STATIC_DRAW);
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sphere001Triangles* VERTICES_PER_TRIANGLE* FLOATS_PER_VERTEX* BYTES_PER_FLOAT, sphere001Vertices);
+	glBufferSubData(GL_ARRAY_BUFFER, sphere001Triangles* VERTICES_PER_TRIANGLE* FLOATS_PER_VERTEX* BYTES_PER_FLOAT, sphere001Triangles* VERTICES_PER_TRIANGLE* FLOATS_PER_NORMAL* BYTES_PER_FLOAT, sphere001Normals);
+	glBufferSubData(GL_ARRAY_BUFFER, sphere001Triangles* VERTICES_PER_TRIANGLE* FLOATS_PER_VERTEX* BYTES_PER_FLOAT + sphere001Triangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT, sphere001Triangles* VERTICES_PER_TRIANGLE* FLOATS_PER_TEXCOORD* BYTES_PER_FLOAT, sphere001Textures);
+
+	vPosition = glGetAttribLocation(programID, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, FLOATS_PER_VERTEX, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, FLOATS_PER_NORMAL, GL_FLOAT, GL_FALSE, 0,
+		BUFFER_OFFSET(sphere001Triangles* VERTICES_PER_TRIANGLE* FLOATS_PER_VERTEX* BYTES_PER_FLOAT));
+
+	vTexture = glGetAttribLocation(programID, "vTexture");
+	glEnableVertexAttribArray(vTexture);
+	glVertexAttribPointer(vTexture, FLOATS_PER_TEXCOORD, GL_FLOAT, GL_FALSE, 0,
+		BUFFER_OFFSET(sphere001Triangles* VERTICES_PER_TRIANGLE* FLOATS_PER_VERTEX* BYTES_PER_FLOAT + sphere001Triangles * VERTICES_PER_TRIANGLE * FLOATS_PER_NORMAL * BYTES_PER_FLOAT));
 }
 
 /*
@@ -405,6 +411,9 @@ void init(string vertexShader, string fragmentShader) {
 	buildObjects();
 	getLocations();
 
+	mat4x4_identity(viewingMatrix);
+	mat4x4_ortho(projectionMatrix, -10.0f, 10.0f, -10.0f, 10.0f, -100.0f, 100.0f);
+
 	buildAndSetupTextures();
 }
 /*
@@ -446,7 +455,7 @@ void display() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// needed
 	glUseProgram(programID);
-	glBindTexture(GL_TEXTURE_2D, textureID[currentTextureMap]);
+	glBindTexture(GL_TEXTURE_2D, textureID[0]);
 	GLuint texLocation = glGetUniformLocation(programID, "tex");
 
 	GLuint modelMatrixLocation = glGetUniformLocation(programID, "modelingMatrix");
@@ -454,24 +463,68 @@ void display() {
 //	glBindVertexArray(vertexBuffers[0]);
 //	glBindBuffer(GL_ARRAY_BUFFER, arrayBuffers[0]);
 //	glDrawArrays(GL_TRIANGLES, 0, nbrTriangles * 3);
-	mat4x4 scaling, teapotModelingMatrix;
+	mat4x4 scaling, teapotModelingMatrix, translateTeapot;
 	mat4x4_identity(scaling);
-	mat4x4_scale_aniso(scaling, scaling, 1.0f / 40.0f, 1.0f / 40.0f, 1.0f / 40.0f);
-	mat4x4_mul(teapotModelingMatrix, rotation, scaling);
+	mat4x4_scale_aniso(scaling, scaling, 10.0f / 40.0f, 10.0f / 40.0f, 10.0f / 40.0f);
+	mat4x4_translate(translateTeapot, -4.5f, 5.5f, 5.5f);
+	mat4x4_mul(teapotModelingMatrix, translateTeapot, scaling);
 	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)teapotModelingMatrix);
 	glBindVertexArray(teapotVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, teapotBAO);
 	glDrawArrays(GL_TRIANGLES, 0, teapotTriangles*3);
 
-	mat4x4 scalingCube, cube001ModelingMatrix;
+	glBindTexture(GL_TEXTURE_2D, textureID[1]);
+
+	mat4x4 scalingCube, cube001ModelingMatrix, translateCube001;
 	mat4x4_identity(scalingCube);
-	mat4x4_scale_aniso(scalingCube, scalingCube, 1.0f / 4.0f, 1.0f / 4.0f, 1.0f / 4.0f);
-	mat4x4_mul(cube001ModelingMatrix, rotation, scalingCube);
+	mat4x4_scale_aniso(scalingCube, scalingCube, 10.0f / 4.0f, 10.0f / 4.0f, 10.0f / 4.0f);
+	mat4x4_translate(translateCube001, 5.5f, 5.5f, -5.5f);
+	mat4x4_mul(cube001ModelingMatrix, translateCube001, scalingCube);
 	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)cube001ModelingMatrix);
 	glBindVertexArray(cube001VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, cube001BAO);
 	glDrawArrays(GL_TRIANGLES, 0, cube001Triangles * 3);
 
+	glBindTexture(GL_TEXTURE_2D, textureID[2]);
+
+	mat4x4 scalingCube2, cube0012ModelingMatrix, translateCube0012;
+	mat4x4_identity(scalingCube2);
+	mat4x4_scale_aniso(scalingCube2, scalingCube2, 10.0f / 4.0f, 10.0f / 4.0f, 10.0f / 4.0f);
+	mat4x4_translate(translateCube0012, 5.5f, -5.5f, 5.5f);
+	mat4x4_mul(cube0012ModelingMatrix, translateCube0012, scalingCube2);
+	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)cube0012ModelingMatrix);
+	glBindVertexArray(cube001VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, cube001BAO);
+	glDrawArrays(GL_TRIANGLES, 0, cube001Triangles * 3);
+
+	glBindTexture(GL_TEXTURE_2D, textureID[3]);
+
+	mat4x4 scalingSphere, sphere001ModelingMatrix, translateSphere;
+	mat4x4_identity(scalingSphere);
+	mat4x4_scale_aniso(scalingSphere, scalingSphere, 10.0f / 3.5f, 10.0f / 3.5f, 10.0f / 3.5f);
+	mat4x4_translate(translateSphere, -3.6f, -4.4f, -5.5f);
+	mat4x4_mul(sphere001ModelingMatrix, translateSphere, scalingSphere);
+	glUniformMatrix4fv(modelMatrixLocation, 1, false, (const GLfloat*)sphere001ModelingMatrix);
+	glBindVertexArray(sphere001VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, sphere001BAO);
+	glDrawArrays(GL_TRIANGLES, 0, sphere001Triangles * 3);
+
+	GLuint viewingMatrixLocation = glGetUniformLocation(programID, "viewingMatrix");
+	glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
+	GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
+	glUniformMatrix4fv(projectionMatrixLocation, 1, false, (const GLfloat*)projectionMatrix);
+	mat4x4 MVMatrix, MVPMatrix;
+	mat4x4_mul(MVMatrix, viewingMatrix, rotation);
+	mat4x4_mul(MVPMatrix, projectionMatrix, MVMatrix);
+
+	for (int i = 0; i < 3; i++) {  // zero out last row and column.
+		MVMatrix[i][3] = 0;
+		MVMatrix[3][i] = 0;
+	}
+	MVMatrix[3][3] = 1;
+	mat4x4 inverted;
+	mat4x4_invert(inverted, MVMatrix);  // inverting should give the proper
+										// matrix in the upper 3x3.
 }
 
 /*

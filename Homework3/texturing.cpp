@@ -485,6 +485,47 @@ void display() {
 	glBindBuffer(GL_ARRAY_BUFFER, cube001BAO);
 	glDrawArrays(GL_TRIANGLES, 0, cube001Triangles * 3);
 
+	/*
+	PART A
+
+	GLfloat vPosition[] = {
+		0.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f
+	};
+
+	GLfloat vColor[] = {
+		0.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 0.0f,
+		1.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 1.0f
+	};
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glGenBuffers(1, &BAO);
+	glBindBuffer(GL_ARRAY_BUFFER, BAO);
+	glBufferData(GL_ARRAY_BUFFER, vPosition.size() * sizeof(GL_FLOAT), vPosition.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glGenBuffers(1, &BAO2);
+	glBindBuffer(GL_ARRAY_BUFFER, BAO2);
+	glBufferData(GL_ARRAY_BUFFER, vColor.size() * sizeof(GL_FLOAT), vPosition.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glBindVertexArray(0);
+	glDiableVertexAttribArray(0);
+	glDiableVertexAttribArray(1);
+
+
+	*/
+
 	glBindTexture(GL_TEXTURE_2D, textureID[2]);
 
 	mat4x4 scalingCube2, cube0012ModelingMatrix, translateCube0012;
@@ -513,18 +554,7 @@ void display() {
 	glUniformMatrix4fv(viewingMatrixLocation, 1, false, (const GLfloat*)viewingMatrix);
 	GLuint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
 	glUniformMatrix4fv(projectionMatrixLocation, 1, false, (const GLfloat*)projectionMatrix);
-	mat4x4 MVMatrix, MVPMatrix;
-	mat4x4_mul(MVMatrix, viewingMatrix, rotation);
-	mat4x4_mul(MVPMatrix, projectionMatrix, MVMatrix);
-
-	for (int i = 0; i < 3; i++) {  // zero out last row and column.
-		MVMatrix[i][3] = 0;
-		MVMatrix[3][i] = 0;
-	}
-	MVMatrix[3][3] = 1;
-	mat4x4 inverted;
-	mat4x4_invert(inverted, MVMatrix);  // inverting should give the proper
-										// matrix in the upper 3x3.
+	
 }
 
 /*
